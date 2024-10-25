@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ciudadanos {
+  ciudadano_id Int @id @default(autoincrement())
+  cuil String @unique
+  nombre String
+  apellido String
+  email String @unique
+  telefono String
+  es_vecino Boolean
+  creado_en DateTime @default(now())
+  actualizado_en DateTime? @updatedAt
+
+  rel_ciudadanos_direcciones rel_ciudadanos_direcciones[] 
+}
+
+model direcciones_ciudadanos {
+  direccion_ciudadano_id Int @id @default(autoincrement())
+  calle String
+  numero Int
+  orientacion String
+  zona Int
+  latitud Float
+  longitud Float
+  creado_en DateTime @default(now())
+  actualizado_en DateTime? @updatedAt
+
+  rel_ciudadanos_direcciones rel_ciudadanos_direcciones[] 
+}
+
+model rel_ciudadanos_direcciones {
+  rel_ciudadano_direccion_id Int @id @default(autoincrement())
+  ciudadano_id Int
+  direccion_ciudadano_id Int
+
+  ciudadanos ciudadanos @relation(fields: [ciudadano_id], references: [ciudadano_id], onDelete: Cascade)
+  direcciones_ciudadanos direcciones_ciudadanos @relation(fields: [direccion_ciudadano_id], references: [direccion_ciudadano_id], onDelete: Cascade)
+}
