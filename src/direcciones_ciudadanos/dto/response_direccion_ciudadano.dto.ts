@@ -12,6 +12,6 @@ export class ResponseDireccionCiudadanoDto extends BaseDireccionCiudadanoDto {
     @ApiProperty()
     actualizado_en: Date;
 
-    @ApiProperty({ type: [CiudadanoDireccionResponseDto] })
+    @ApiProperty()
     ciudadanos?: CiudadanoDireccionResponseDto[];
 }

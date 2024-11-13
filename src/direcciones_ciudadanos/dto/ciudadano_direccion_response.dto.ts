@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-import { BaseDireccionCiudadanoDto } from './base_direccion_ciudadano.dto';
 import { Type } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsDate } from 'class-validator';
-export class CiudadanoDireccionResponseDto extends BaseDireccionCiudadanoDto {
+import { BaseCiudadanoDto } from 'src/ciudadanos/dto/base_ciudadano.dto';
+export class CiudadanoDireccionResponseDto extends BaseCiudadanoDto {
     @ApiProperty()
     @IsInt()
     @IsNotEmpty()

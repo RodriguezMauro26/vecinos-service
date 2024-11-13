@@ -27,7 +27,7 @@ export class DireccionesCiudadanosService {
       include: {
         rel_ciudadanos_direcciones: {
           include: {
-            ciudadanos: true, // Incluir ciudadanos al crear dirección
+            ciudadanos: true,
           }
         }
       }
@@ -60,7 +60,7 @@ export class DireccionesCiudadanosService {
         },
       };
     }
-    return this.prisma.direcciones_ciudadanos.findMany({
+    const direcciones = await this.prisma.direcciones_ciudadanos.findMany({
       ...findOptions,
       include: {
         rel_ciudadanos_direcciones: {
@@ -70,19 +70,47 @@ export class DireccionesCiudadanosService {
         },
       }
     })
+    if (direcciones.length === 0) {
+      return null;
+    }
+    const resultados = direcciones.map((direccion) => {
+      const resultado = {
+        ...direccion,
+        ciudadanos: direccion.rel_ciudadanos_direcciones
+          .filter(ciudadano => 'ciudadanos' in ciudadano)
+          .map(ciudadano => ciudadano.ciudadanos)
+      }
+      delete resultado.rel_ciudadanos_direcciones
+      return resultado
+    })
+    return resultados
+
   }
 
   async findOne(id: number): Promise<ResponseDireccionCiudadanoDto | null> {
-    return this.prisma.direcciones_ciudadanos.findUnique({
+    const direccion = await this.prisma.direcciones_ciudadanos.findUnique({
       where: { direccion_ciudadano_id: id },
       include: {
         rel_ciudadanos_direcciones: {
           include: {
-            ciudadanos: true,  // Asegúrate de incluir esta relación si 'ciudadanos' es requerido en tu DTO.
+            ciudadanos: true,
           },
         },
       }
     })
+    if (!direccion) {
+      return null;
+    }
+
+    const resultado = {
+      ...direccion,
+      direcciones: direccion.rel_ciudadanos_direcciones.map(
+        (rel) => rel.ciudadanos,
+      ),
+    };
+    delete resultado.rel_ciudadanos_direcciones;
+
+    return resultado;
   }
 
   async update(id: number, data: UpdateDireccionesCiudadanoDto): Promise<ResponseDireccionCiudadanoDto> {
@@ -113,7 +141,6 @@ export class DireccionesCiudadanosService {
       return updatedDireccion;
     });
   }
-
 
   async remove(id: number): Promise<ResponseDireccionCiudadanoDto> {
     return this.prisma.direcciones_ciudadanos.delete({

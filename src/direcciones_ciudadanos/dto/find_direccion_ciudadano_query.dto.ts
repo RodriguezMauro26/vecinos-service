@@ -5,7 +5,7 @@ import { IsIn, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class FindDireccionCiudadanoQueryDto {
   @ApiPropertyOptional({
-    description: 'Cantidad de posts a obtener',
+    description: 'Cantidad de direcciones a obtener',
     type: Number,
   })
   @IsOptional()
@@ -14,7 +14,7 @@ export class FindDireccionCiudadanoQueryDto {
   take?: number;
 
   @ApiPropertyOptional({
-    description: 'Cantidad de posts a omitir',
+    description: 'Cantidad de direcciones a omitir',
     type: Number,
   })
   @IsOptional()
@@ -24,12 +24,12 @@ export class FindDireccionCiudadanoQueryDto {
 
   @ApiPropertyOptional({
     description: 'Campo para ordenar',
-    enum: ['title', 'published'],
+    enum: ['calle', 'zona', 'creado_en', 'actualizado_en'],
   })
   @IsOptional()
   @IsString({ message: 'El parámetro orderBy debe ser un string' })
-  @IsIn(['title', 'published'], {
-    message: 'El parámetro orderBy debe ser title/published',
+  @IsIn(['calle', 'zona', 'creado_en', 'actualizado_en'], {
+    message: 'El parámetro orderBy debe ser calle/zona/creado_en/actualizado_en',
     always: false,
   })
   orderBy?: string;
@@ -48,12 +48,12 @@ export class FindDireccionCiudadanoQueryDto {
 
   @ApiPropertyOptional({
     description: 'Campo para filtrar',
-    enum: ['title', 'content', 'published'],
+    enum: ['calle', 'zona'],
   })
   @IsOptional()
   @IsString({ message: 'El parámetro filterBy debe ser un string' })
-  @IsIn(['title', 'content', 'published'], {
-    message: 'El parámetro filterBy debe ser title/content/published',
+  @IsIn(['calle', 'zona'], {
+    message: 'El parámetro filterBy debe ser calle/zona',
     always: false,
   })
   filterBy?: string;

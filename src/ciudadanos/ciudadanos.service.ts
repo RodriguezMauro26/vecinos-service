@@ -60,29 +60,58 @@ export class CiudadanosService {
         },
       };
     }
-    return this.prisma.ciudadanos.findMany({
+
+    const ciudadanos = await this.prisma.ciudadanos.findMany({
       ...findOptions,
       include: {
         rel_ciudadanos_direcciones: {
           include: {
-            direcciones_ciudadanos: true
-          }
-        }
+            direcciones_ciudadanos: true,
+          },
+        },
       }
+    });
+
+    if (ciudadanos.length === 0) {
+      return null;
+    }
+    const resultados = ciudadanos.map((ciudadano) => {
+      const resultado = {
+        ...ciudadano, direcciones: ciudadano.rel_ciudadanos_direcciones
+          .filter(direccion => 'direcciones_ciudadanos' in direccion)
+          .map(direccion => direccion.direcciones_ciudadanos)
+      }
+      delete resultado.rel_ciudadanos_direcciones
+      return resultado
     })
+
+    return resultados;
   }
 
   async findOne(id: number): Promise<ResponseCiudadanoDto | null> {
-    return this.prisma.ciudadanos.findUnique({
+    const ciudadano = await this.prisma.ciudadanos.findUnique({
       where: { ciudadano_id: id },
       include: {
         rel_ciudadanos_direcciones: {
           include: {
-            direcciones_ciudadanos: true
-          }
-        }
-      }
-    })
+            direcciones_ciudadanos: true,
+          },
+        },
+      },
+    });
+    if (!ciudadano) {
+      return null;
+    }
+
+    const resultado = {
+      ...ciudadano,
+      direcciones: ciudadano.rel_ciudadanos_direcciones.map(
+        (rel) => rel.direcciones_ciudadanos,
+      ),
+    };
+    delete resultado.rel_ciudadanos_direcciones;
+
+    return resultado;
   }
 
   async update(id: number, data: UpdateCiudadanoDto): Promise<ResponseCiudadanoDto> {
@@ -95,8 +124,8 @@ export class CiudadanosService {
           rel_ciudadanos_direcciones: {
             include: {
               direcciones_ciudadanos: true,
-            }
-          }
+            },
+          },
         },
       });
       if (direcciones_ciudadanos_id) {
@@ -104,7 +133,7 @@ export class CiudadanosService {
           where: { ciudadano_id: id },
         });
         await prisma.rel_ciudadanos_direcciones.createMany({
-          data: direcciones_ciudadanos_id.map(direccionId => ({
+          data: direcciones_ciudadanos_id.map((direccionId) => ({
             ciudadano_id: id,
             direccion_ciudadano_id: direccionId,
           })),
@@ -114,17 +143,16 @@ export class CiudadanosService {
     });
   }
 
-
   async remove(id: number): Promise<ResponseCiudadanoDto> {
     return this.prisma.ciudadanos.delete({
       include: {
         rel_ciudadanos_direcciones: {
           include: {
-            direcciones_ciudadanos: false
-          }
-        }
+            direcciones_ciudadanos: false,
+          },
+        },
       },
-      where: { ciudadano_id: id }
-    })
+      where: { ciudadano_id: id },
+    });
   }
 }

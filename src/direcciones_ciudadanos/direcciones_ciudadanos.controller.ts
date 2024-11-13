@@ -7,7 +7,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseDireccionCiudadanoDto } from './dto/response_direccion_ciudadano.dto';
 import { FindDireccionCiudadanoQueryDto } from './dto/find_direccion_ciudadano_query.dto';
 
-@ApiTags('direcciones')
+@ApiTags('Direcciones Ciudadanos')
 @Controller('direcciones')
 export class DireccionesCiudadanosController {
   constructor(private readonly DireccionesCiudadanosService: DireccionesCiudadanosService) { }
