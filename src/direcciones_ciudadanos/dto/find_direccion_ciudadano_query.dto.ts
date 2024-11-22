@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsIn, IsInt, IsOptional, IsString } from 'class-validator';
@@ -29,7 +28,8 @@ export class FindDireccionCiudadanoQueryDto {
   @IsOptional()
   @IsString({ message: 'El parámetro orderBy debe ser un string' })
   @IsIn(['calle', 'zona', 'creado_en', 'actualizado_en'], {
-    message: 'El parámetro orderBy debe ser calle/zona/creado_en/actualizado_en',
+    message:
+      'El parámetro orderBy debe ser calle/zona/creado_en/actualizado_en',
     always: false,
   })
   orderBy?: string;

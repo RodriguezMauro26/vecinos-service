@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { CreateCiudadanoDto } from './dto/create_ciudadano.dto';
 import { UpdateCiudadanoDto } from './dto/update_ciudadano.dto';
@@ -9,19 +8,21 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CiudadanosService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-  async create(createCiudadanoDto: CreateCiudadanoDto): Promise<ResponseCiudadanoDto> {
+  async create(
+    createCiudadanoDto: CreateCiudadanoDto,
+  ): Promise<ResponseCiudadanoDto> {
     const { direcciones_ciudadanos_id, ...data } = createCiudadanoDto;
     return this.prisma.ciudadanos.create({
       data: {
         ...data,
         rel_ciudadanos_direcciones: direcciones_ciudadanos_id
           ? {
-            create: direcciones_ciudadanos_id.map((direccionId) => ({
-              direccion_ciudadano_id: direccionId,
-            })),
-          }
+              create: direcciones_ciudadanos_id.map(direccionId => ({
+                direccion_ciudadano_id: direccionId,
+              })),
+            }
           : undefined,
       },
       include: {
@@ -69,21 +70,22 @@ export class CiudadanosService {
             direcciones_ciudadanos: true,
           },
         },
-      }
+      },
     });
 
     if (ciudadanos.length === 0) {
       return null;
     }
-    const resultados = ciudadanos.map((ciudadano) => {
+    const resultados = ciudadanos.map(ciudadano => {
       const resultado = {
-        ...ciudadano, direcciones: ciudadano.rel_ciudadanos_direcciones
+        ...ciudadano,
+        direcciones: ciudadano.rel_ciudadanos_direcciones
           .filter(direccion => 'direcciones_ciudadanos' in direccion)
-          .map(direccion => direccion.direcciones_ciudadanos)
-      }
-      delete resultado.rel_ciudadanos_direcciones
-      return resultado
-    })
+          .map(direccion => direccion.direcciones_ciudadanos),
+      };
+      delete resultado.rel_ciudadanos_direcciones;
+      return resultado;
+    });
 
     return resultados;
   }
@@ -106,7 +108,7 @@ export class CiudadanosService {
     const resultado = {
       ...ciudadano,
       direcciones: ciudadano.rel_ciudadanos_direcciones.map(
-        (rel) => rel.direcciones_ciudadanos,
+        rel => rel.direcciones_ciudadanos,
       ),
     };
     delete resultado.rel_ciudadanos_direcciones;
@@ -114,9 +116,12 @@ export class CiudadanosService {
     return resultado;
   }
 
-  async update(id: number, data: UpdateCiudadanoDto): Promise<ResponseCiudadanoDto> {
+  async update(
+    id: number,
+    data: UpdateCiudadanoDto,
+  ): Promise<ResponseCiudadanoDto> {
     const { direcciones_ciudadanos_id, ...ciudadanoData } = data;
-    return this.prisma.$transaction(async (prisma) => {
+    return this.prisma.$transaction(async prisma => {
       const updatedCiudadano = await prisma.ciudadanos.update({
         where: { ciudadano_id: id },
         data: ciudadanoData,
@@ -133,7 +138,7 @@ export class CiudadanosService {
           where: { ciudadano_id: id },
         });
         await prisma.rel_ciudadanos_direcciones.createMany({
-          data: direcciones_ciudadanos_id.map((direccionId) => ({
+          data: direcciones_ciudadanos_id.map(direccionId => ({
             ciudadano_id: id,
             direccion_ciudadano_id: direccionId,
           })),
